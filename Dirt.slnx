@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Dirt.CLI/Dirt.CLI.csproj" />
+  <Project Path="Dirt.Interpreter/Dirt.Interpreter.csproj" />
+  <Project Path="Dirt.Lexer/Dirt.Lexer.csproj" />
+  <Project Path="Dirt.Parser/Dirt.Parser.csproj" />
+  <Project Path="Dirt.TypeChecker/Dirt.TypeChecker.csproj" />
+</Solution>

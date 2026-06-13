@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dirt.Interpreter\Dirt.Interpreter.csproj" />
+    <ProjectReference Include="..\Dirt.Lexer\Dirt.Lexer.csproj" />
+    <ProjectReference Include="..\Dirt.Parser\Dirt.Parser.csproj" />
+    <ProjectReference Include="..\Dirt.TypeChecker\Dirt.TypeChecker.csproj" />
+  </ItemGroup>
+
+</Project>
