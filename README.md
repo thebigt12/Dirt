@@ -1,4 +1,4 @@
-\# Dirt
+# Dirt
 
 
 
@@ -10,7 +10,7 @@ It's called Dirt because it is pretty useless afterall.
 
 
 
-\## What it does
+## What it does
 
 
 
@@ -18,15 +18,15 @@ Dirt is a small programming language with its own lexer, parser, and (planned) i
 
 
 
-\- `name: type` syntax, types: `int`, `dec`, `string`, `bool`
+- `name: type` syntax, types: `int`, `dec`, `string`, `bool`
 
-\- `when/otherwise`, `repeat`, `match` — orthogonal, combinable control flow constructs
+- `when/otherwise`, `repeat`, `match` — orthogonal, combinable control flow constructs
 
-\- `stop` = break + early return
+- `stop` = break + early return
 
-\- `out()` for output, `and/or/not` as keywords
+- `out()` for output, `and/or/not` as keywords
 
-\- Implicit return, no semicolons
+- Implicit return, no semicolons
 
 
 
@@ -54,7 +54,7 @@ when (x > 5) {
 
 
 
-\## Status
+## Status
 
 
 
@@ -64,11 +64,11 @@ Parser — variables, expressions, `when/otherwise`, `repeat`, `match` done; fun
 
 Interpreter \& TypeChecker — planned
 
-Other extensions — planned for when the initial tasks are functionable
+Other extensions — planned for when the initial tasks are funcioning
 
 
 
-\## Running
+## Running
 
 
 
@@ -78,15 +78,15 @@ dotnet run
 
 
 
-\## Requirements
+## Requirements
 
 
 
-\- .NET SDK (8.0 or newer)
+- .NET SDK (8.0 or newer)
 
 
 
-\## Sidenotes
+## Sidenotes
 
 
 
