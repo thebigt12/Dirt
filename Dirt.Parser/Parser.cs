@@ -17,19 +17,24 @@ namespace Dirt.Parser
             _index = 0;
         }
 
-        public Token Peek()
+        private Token Peek()
         {
             return _tokens[_index];
         }
 
-        public Token Consume()
+        private Token PeekNext()
+        {
+            return _tokens[_index + 1];
+        }
+
+        private Token Consume()
         {
             Token returner = _tokens[_index];
             _index++;
             return returner;
         }
 
-        public Token Expect(TokenType type)
+        private Token Expect(TokenType type)
         {
             if (Peek().TokenType != type)
             {
@@ -59,7 +64,12 @@ namespace Dirt.Parser
             switch (current.TokenType)
             {
                 case TokenType.Identifier:
-                    return ParseVarDeclaration();
+                    if (PeekNext().TokenType == TokenType.LBracket)
+                        return ParseFunctionDeclaration();
+                    else if (PeekNext().TokenType == TokenType.Colon)
+                        return ParseVarDeclaration();
+                    else
+                        return ParseExpression();
                 case TokenType.Output:
                     return ParseOutStatement();
                 case TokenType.When:
@@ -110,6 +120,21 @@ namespace Dirt.Parser
                     Expect(TokenType.RBracket);
                     return inner;
                 case TokenType.Identifier:
+                    if(Peek().TokenType == TokenType.LBracket)
+                    {
+                        Consume();
+                        List<AstNode> args = new List<AstNode>();
+                        while(Peek().TokenType != TokenType.RBracket)
+                        {
+                            args.Add(ParseExpression());
+                            if (Peek().TokenType == TokenType.Comma)
+                            {
+                                Consume();
+                            }
+                        }
+                        Expect(TokenType.RBracket);
+                        return new FunctionCall(current.Value, args);
+                    }
                     return new IdentifierNode(current.Value);
                 default:
                     throw new Exception($"Unexpected Token on line {current.Line}");
@@ -263,6 +288,30 @@ namespace Dirt.Parser
             Expect(TokenType.Arrow);
             List<AstNode> list = ParseBlock();
             return new MatchArm(pattern, list);
+        }
+        private AstNode ParseFunctionDeclaration()
+        {
+            //x(a,b): int{}
+            string name = Expect(TokenType.Identifier).Value;
+            Expect(TokenType.LBracket);
+            List<Parameter> list = new List<Parameter>();
+            while(Peek().TokenType != TokenType.RBracket) {
+                string pname = Expect(TokenType.Identifier).Value;
+                Expect(TokenType.Colon);
+                TokenType ptype = Consume().TokenType;
+                list.Add(new Parameter(pname, ptype));
+                if(Peek().TokenType == TokenType.Comma)
+                {
+                    Consume();
+                }
+            }
+            Expect(TokenType.RBracket);
+            TokenType? type = null;
+            if(Peek().TokenType == TokenType.Colon) {
+                Consume();
+                type = Consume().TokenType;
+            }
+            return new FunctionDeclaration(name, list, type, ParseBlock());
         }
     }
 }

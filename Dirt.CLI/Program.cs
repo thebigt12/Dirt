@@ -2,7 +2,7 @@
 using Dirt.Parser;
 using Dirt.Parser.Nodes;
 
-string source = "match (x) {\n1 -> {\nout(\"eins\")\n}\n2..5 -> {\nout(\"zwei\")\n}\n_ -> {\nout(\"rest\")\n}\n}";
+string source = "out(add(1,2))";
 Lexer lexer = new Lexer(source);
 List<Token> tokens = lexer.Tokenize();
 
@@ -90,6 +90,20 @@ void Print(AstNode node, int indent)
             break;
         case WildcardPattern:
             Console.WriteLine($"{pad}Wildcard (_)");
+            break;
+        case FunctionDeclaration f:
+            Console.WriteLine($"{pad}Function: {f.Name} (returns: {(f.ReturnType == null ? "nothing" : f.ReturnType.ToString())})");
+            Console.WriteLine($"{pad}  Parameters:");
+            foreach (Parameter p in f.Parameters)
+                Console.WriteLine($"{pad}    {p.Name}: {p.Type}");
+            Console.WriteLine($"{pad}  Body:");
+            foreach (AstNode stmt in f.Body)
+                Print(stmt, indent + 2);
+            break;
+        case FunctionCall fc:
+            Console.WriteLine($"{pad}Call: {fc.Name}");
+            foreach (AstNode arg in fc.Args)
+                Print(arg, indent + 1);
             break;
     }
 }
