@@ -68,7 +68,9 @@ namespace Dirt.Parser
                         return ParseFunctionDeclaration();
                     else if (PeekNext().TokenType == TokenType.Colon)
                         return ParseVarDeclaration();
-                    else
+                    else if(PeekNext().TokenType == TokenType.Equals) {
+                        return ParseAssignment();
+                    }
                         return ParseExpression();
                 case TokenType.Output:
                     return ParseOutStatement();
@@ -199,6 +201,14 @@ namespace Dirt.Parser
             return new VarDeclaration(name, type, ParseExpression());
         }
 
+        private AstNode ParseAssignment()
+        {
+            //x = 5;
+            string name = Expect(TokenType.Identifier).Value;
+            Expect(TokenType.Equals);
+            AstNode value = ParseExpression();
+            return new Assignment(name, value);
+        }
         private AstNode ParseOutStatement()
         {
             //out("hello")
