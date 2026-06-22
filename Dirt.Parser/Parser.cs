@@ -1,7 +1,5 @@
 ﻿using Dirt.Lexer;
 using Dirt.Parser.Nodes;
-using System.ComponentModel;
-using System.Reflection.Metadata.Ecma335;
 
 namespace Dirt.Parser
 {
@@ -68,10 +66,11 @@ namespace Dirt.Parser
                         return ParseFunctionDeclaration();
                     else if (PeekNext().TokenType == TokenType.Colon)
                         return ParseVarDeclaration();
-                    else if(PeekNext().TokenType == TokenType.Equals) {
+                    else if (PeekNext().TokenType == TokenType.Equals)
+                    {
                         return ParseAssignment();
                     }
-                        return ParseExpression();
+                    return ParseExpression();
                 case TokenType.Output:
                     return ParseOutStatement();
                 case TokenType.When:
@@ -80,6 +79,8 @@ namespace Dirt.Parser
                     return ParseRepeatStatement();
                 case TokenType.Match:
                     return ParseMatchStatement();
+                case TokenType.Stop:
+                    return ParseStopStatement();
             }
             throw new Exception($"Unexpected STATEMENT on {current.Line}");
         }
@@ -88,9 +89,9 @@ namespace Dirt.Parser
         {
             Expect(TokenType.LBrace);
             List<AstNode> list = new List<AstNode>();
-            while(Peek().TokenType != TokenType.RBrace && Peek().TokenType != TokenType.EOF)
+            while (Peek().TokenType != TokenType.RBrace && Peek().TokenType != TokenType.EOF)
             {
-                if(Peek().TokenType == TokenType.Newline)
+                if (Peek().TokenType == TokenType.Newline)
                 {
                     Consume();
                     continue;
@@ -122,11 +123,11 @@ namespace Dirt.Parser
                     Expect(TokenType.RBracket);
                     return inner;
                 case TokenType.Identifier:
-                    if(Peek().TokenType == TokenType.LBracket)
+                    if (Peek().TokenType == TokenType.LBracket)
                     {
                         Consume();
                         List<AstNode> args = new List<AstNode>();
-                        while(Peek().TokenType != TokenType.RBracket)
+                        while (Peek().TokenType != TokenType.RBracket)
                         {
                             args.Add(ParseExpression());
                             if (Peek().TokenType == TokenType.Comma)
@@ -146,7 +147,7 @@ namespace Dirt.Parser
         private AstNode ParseMultiplicative()
         {
             AstNode left = ParsePrimary();
-            while(Peek().TokenType == TokenType.Star || Peek().TokenType == TokenType.Slash)
+            while (Peek().TokenType == TokenType.Star || Peek().TokenType == TokenType.Slash)
             {
                 Token op = Consume();
                 AstNode right = ParsePrimary();
@@ -227,14 +228,14 @@ namespace Dirt.Parser
             AstNode condition = ParseExpression();
             Expect(TokenType.RBracket);
             bool isRepeat = false;
-            if(Peek().TokenType == TokenType.Repeat)
+            if (Peek().TokenType == TokenType.Repeat)
             {
                 Consume();
                 isRepeat = true;
             }
             List<AstNode> body = ParseBlock();
             List<AstNode> otherwise = null!;
-            if(Peek().TokenType == TokenType.Otherwise)
+            if (Peek().TokenType == TokenType.Otherwise)
             {
                 Consume();
                 otherwise = ParseBlock();
@@ -260,9 +261,9 @@ namespace Dirt.Parser
             Expect(TokenType.RBracket);
             Expect(TokenType.LBrace);
             List<MatchArm> list = new List<MatchArm>();
-            while(Peek().TokenType != TokenType.RBrace)
+            while (Peek().TokenType != TokenType.RBrace)
             {
-                if(Peek().TokenType == TokenType.Newline)
+                if (Peek().TokenType == TokenType.Newline)
                 {
                     Consume();
                     continue;
@@ -276,7 +277,7 @@ namespace Dirt.Parser
         {
             //x -> out || x.. out || _ -> 
             AstNode pattern;
-            if(Peek().TokenType == TokenType.Underscore)
+            if (Peek().TokenType == TokenType.Underscore)
             {
                 Consume();
                 pattern = new WildcardPattern();
@@ -284,7 +285,7 @@ namespace Dirt.Parser
             else
             {
                 AstNode from = ParseExpression();
-                if(Peek().TokenType == TokenType.DoubleDot)
+                if (Peek().TokenType == TokenType.DoubleDot)
                 {
                     Consume();
                     AstNode to = ParseExpression();
@@ -305,23 +306,36 @@ namespace Dirt.Parser
             string name = Expect(TokenType.Identifier).Value;
             Expect(TokenType.LBracket);
             List<Parameter> list = new List<Parameter>();
-            while(Peek().TokenType != TokenType.RBracket) {
+            while (Peek().TokenType != TokenType.RBracket)
+            {
                 string pname = Expect(TokenType.Identifier).Value;
                 Expect(TokenType.Colon);
                 TokenType ptype = Consume().TokenType;
                 list.Add(new Parameter(pname, ptype));
-                if(Peek().TokenType == TokenType.Comma)
+                if (Peek().TokenType == TokenType.Comma)
                 {
                     Consume();
                 }
             }
             Expect(TokenType.RBracket);
             TokenType? type = null;
-            if(Peek().TokenType == TokenType.Colon) {
+            if (Peek().TokenType == TokenType.Colon)
+            {
                 Consume();
                 type = Consume().TokenType;
             }
             return new FunctionDeclaration(name, list, type, ParseBlock());
+        }
+
+        private AstNode ParseStopStatement()
+        {
+            Expect(TokenType.Stop);
+            AstNode? value = null;
+            if (Peek().TokenType != TokenType.EOF && Peek().TokenType != TokenType.Newline && Peek().TokenType != TokenType.RBrace)
+            {
+                value = ParseExpression();
+            }
+            return new StopStatementNode(value);
         }
     }
 }

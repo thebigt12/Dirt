@@ -3,7 +3,7 @@ using Dirt.Lexer;
 using Dirt.Parser;
 using Dirt.Parser.Nodes;
 
-string source = "x: int = 3\nwhen (x > 0) repeat {\nout(x)\nx = x - 1\n}"; ;
+string source = "add(a: int, b: int): int {\nstop a + b\n}\nout(add(5, 3))"; 
 Lexer lexer = new Lexer(source);
 List<Token> tokens = lexer.Tokenize();
 
